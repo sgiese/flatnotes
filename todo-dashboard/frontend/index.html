@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Todo Dashboard</h1>
+            <div class="header-controls">
+                <button id="refresh-btn" class="btn btn-primary">🔄 Refresh</button>
+                <div class="stats-mini">
+                    <span id="stats-summary">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="view-tabs">
+            <button class="tab-btn active" data-view="list">List View</button>
+            <button class="tab-btn" data-view="kanban">Kanban Board</button>
+            <button class="tab-btn" data-view="files">By File</button>
+            <button class="tab-btn" data-view="calendar">Calendar</button>
+        </nav>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filter-status">Status:</label>
+                <select id="filter-status">
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-priority">Priority:</label>
+                <select id="filter-priority">
+                    <option value="all">All</option>
+                    <option value="3">High (!!!)</option>
+                    <option value="2">Medium (!!)</option>
+                    <option value="1">Low (!)</option>
+                    <option value="0">None</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-tag">Tag:</label>
+                <select id="filter-tag">
+                    <option value="all">All Tags</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filter-file">File:</label>
+                <select id="filter-file">
+                    <option value="all">All Files</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <input type="text" id="search-input" placeholder="Search todos...">
+            </div>
+        </div>
+
+        <main>
+            <!-- List View -->
+            <div id="list-view" class="view-container active">
+                <div class="todo-list" id="todo-list">
+                    <!-- Todos will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Kanban View -->
+            <div id="kanban-view" class="view-container">
+                <div class="kanban-board">
+                    <div class="kanban-column">
+                        <h3>📋 Backlog</h3>
+                        <div id="kanban-backlog" class="kanban-items"></div>
+                    </div>
+                    <div class="kanban-column">
+                        <h3>📌 To Do</h3>
+                        <div id="kanban-todo" class="kanban-items"></div>
+                    </div>
+                    <div class="kanban-column">
+                        <h3>🚀 In Progress</h3>
+                        <div id="kanban-in_progress" class="kanban-items"></div>
+                    </div>
+                    <div class="kanban-column">
+                        <h3>✅ Done</h3>
+                        <div id="kanban-done" class="kanban-items"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files View -->
+            <div id="files-view" class="view-container">
+                <div id="files-list" class="files-container">
+                    <!-- File groups will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="view-container">
+                <div id="calendar-container" class="calendar">
+                    <!-- Calendar will be inserted here -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="stats-detailed" id="stats-detailed">
+                <!-- Detailed stats will be inserted here -->
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

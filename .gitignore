@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.coverage
+.tox/
+*.log
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Data folder - contains personal notes
+data/
+!data/flatnote-migration.md
+
+# Search index
+.flatnotes/
+
+# Environment
+.env
+.mise.local.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+volumes/
+
+# Temporary files
+*.tmp
+*.bak
+*.backup

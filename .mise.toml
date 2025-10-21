@@ -1,0 +1,96 @@
+# Mise configuration for Flatnotes + Todo Dashboard project
+
+[tools]
+python = "3.11"
+node = "20"
+
+[env]
+PYTHONPATH = "."
+FLATNOTES_DATA_DIR = "./data"
+TODO_API_PORT = "8001"
+TODO_FRONTEND_PORT = "8002"
+FLATNOTES_PORT = "8080"
+
+[tasks.install]
+description = "Install all dependencies"
+run = """
+  echo "📦 Installing Python dependencies for Todo Dashboard..."
+  cd todo-dashboard/backend
+  pip install -r requirements.txt
+  cd ../..
+  echo "✅ Dependencies installed"
+"""
+
+[tasks.todo-backend]
+description = "Start Todo Dashboard backend API"
+run = """
+  cd todo-dashboard/backend
+  echo "🔧 Starting Todo Dashboard API on port $TODO_API_PORT..."
+  python -m uvicorn api:app --host 0.0.0.0 --port $TODO_API_PORT
+"""
+
+[tasks.todo-frontend]
+description = "Start Todo Dashboard frontend server"
+run = """
+  cd todo-dashboard/frontend
+  echo "🌐 Starting Todo Dashboard frontend on port $TODO_FRONTEND_PORT..."
+  python -m http.server $TODO_FRONTEND_PORT
+"""
+
+[tasks.todo]
+description = "Start Todo Dashboard (both backend and frontend)"
+depends = ["install"]
+run = """
+  echo "🚀 Starting Todo Dashboard..."
+  echo "   API: http://localhost:$TODO_API_PORT"
+  echo "   Frontend: http://localhost:$TODO_FRONTEND_PORT"
+  echo "   API Docs: http://localhost:$TODO_API_PORT/docs"
+  
+  # Start both services
+  mise run todo-backend &
+  BACKEND_PID=$!
+  
+  sleep 2
+  
+  mise run todo-frontend &
+  FRONTEND_PID=$!
+  
+  echo ""
+  echo "✅ Todo Dashboard is running!"
+  echo "Press Ctrl+C to stop..."
+  
+  trap "echo '🛑 Stopping...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT
+  wait
+"""
+
+[tasks.flatnotes]
+description = "Start Flatnotes container"
+run = """
+  echo "🗒️ Starting Flatnotes on port $FLATNOTES_PORT..."
+  docker-compose up -d
+  echo "✅ Flatnotes running at http://localhost:$FLATNOTES_PORT"
+"""
+
+[tasks.start]
+description = "Start everything (Flatnotes + Todo Dashboard)"
+run = """
+  mise run flatnotes
+  mise run todo
+"""
+
+[tasks.test-parser]
+description = "Test the todo parser"
+run = """
+  cd todo-dashboard/backend
+  python parser.py
+"""
+
+[tasks.stop]
+description = "Stop all services"
+run = """
+  echo "🛑 Stopping services..."
+  docker-compose down
+  pkill -f "python.*api.py" || true
+  pkill -f "python.*http.server" || true
+  echo "✅ All services stopped"
+"""
