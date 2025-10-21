@@ -10,27 +10,19 @@ lsof -ti:8001 | xargs kill -9 2>/dev/null || true
 lsof -ti:8002 | xargs kill -9 2>/dev/null || true
 sleep 1
 
-# Check if virtual environment exists
-if [ ! -d "backend/venv" ]; then
-    echo "📦 Creating virtual environment..."
-    cd backend
-    python3 -m venv venv
-    source venv/bin/activate
-    echo "📦 Installing dependencies..."
-    pip install -r requirements.txt
-    cd ..
-else
-    cd backend
-    source venv/bin/activate
-    cd ..
-fi
+# Navigate to project root to use mise
+cd "$(dirname "$0")/.."
 
-# Start backend
+# Ensure mise dependencies are installed
+echo "📦 Ensuring dependencies are installed..."
+mise exec -- pip install -q -r todo-dashboard/backend/requirements.txt
+
+# Start backend using mise
 echo "🔧 Starting backend API on port 8001..."
-cd backend
-python -m uvicorn api:app --host 0.0.0.0 --port 8001 &
+mise exec -- python -m uvicorn api:app --host 0.0.0.0 --port 8001 --app-dir todo-dashboard/backend &
 BACKEND_PID=$!
-cd ..
+
+cd todo-dashboard
 
 # Start frontend server
 echo "🌐 Starting frontend server on port 8002..."

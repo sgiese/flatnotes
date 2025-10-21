@@ -321,7 +321,7 @@ function renderListView(todos) {
                     `}
                     <div class="todo-group-items">
                         ${group.todos.map(todo => `
-                            <div class="todo-item grouped">
+                            <div class="todo-item grouped" style="margin-left: ${todo.indent_pixels || 0}px">
                                 <input type="checkbox" 
                                        class="todo-checkbox" 
                                        ${todo.completed ? 'checked' : ''}
@@ -329,7 +329,7 @@ function renderListView(todos) {
                                 <div class="todo-content">
                                     <div class="todo-text ${todo.completed ? 'completed' : ''}">
                                         ${renderPriority(todo.priority)}
-                                        ${escapeHtml(todo.text)}
+                                        ${todo.formatted_text || escapeHtml(todo.text)}
                                     </div>
                                     <div class="todo-meta compact">
                                         ${todo.tags.map(tag => `<span class="todo-tag">#${tag}</span>`).join('')}
@@ -353,7 +353,7 @@ function renderListView(todos) {
                     <div class="todo-content">
                         <div class="todo-text ${todo.completed ? 'completed' : ''}">
                             ${renderPriority(todo.priority)}
-                            ${escapeHtml(todo.text)}
+                            ${todo.formatted_text || escapeHtml(todo.text)}
                         </div>
                         <div class="todo-meta">
                             <a href="${FLATNOTES_URL}/note/${encodeURIComponent(todo.file.replace('.md', ''))}#L${todo.line_number}" 

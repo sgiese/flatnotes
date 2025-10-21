@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 from datetime import datetime
 import json
+import mistune
 
 
 class TodoParser:
@@ -21,6 +22,8 @@ class TodoParser:
         self.tag_pattern = re.compile(r'#(\w+(?:-\w+)*)')
         self.date_pattern = re.compile(r'\b(\d{4}-\d{2}-\d{2})\b')
         self.priority_pattern = re.compile(r'(?:^|\s)(!{1,3})(?:\s|$)')
+        # Initialize mistune markdown renderer for inline formatting only
+        self.markdown = mistune.create_markdown(renderer='html', plugins=['strikethrough'])
         
     def scan_markdown_files(self) -> List[Path]:
         """Recursively find all .md files in data directory"""
@@ -114,6 +117,11 @@ class TodoParser:
                 # Extract metadata
                 metadata = self.extract_metadata(text, file_path, i + 1, context)
                 
+                # Format text with markdown - render as inline HTML
+                # Strip any paragraph tags since we're just formatting inline text
+                formatted_html = self.markdown(metadata["text"])
+                formatted_text = formatted_html.replace('<p>', '').replace('</p>', '').strip()
+                
                 # Build todo object
                 todo = {
                     "id": self.generate_todo_id(str(file_path), i + 1, text),
@@ -121,8 +129,10 @@ class TodoParser:
                     "file_path": str(file_path),
                     "line_number": i + 1,
                     "indent_level": indent // 2,  # Convert spaces to indent level
+                    "indent_pixels": indent * 10,  # Pixels for CSS indentation
                     "completed": completed,
                     "text": metadata["text"],
+                    "formatted_text": formatted_text,
                     "raw_text": metadata["raw_text"],
                     "tags": metadata["tags"],
                     "due_date": metadata["due_date"],

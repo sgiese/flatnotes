@@ -66,10 +66,11 @@ mise run flatnotes
 
 # Start Todo Dashboard
 mise run todo
-
-# Or manually with the start script
-./todo-dashboard/start.sh
 ```
+
+Stop Todo Dashboard:
+- Press `Ctrl+C` in the terminal where it's running, or
+- From another terminal: `pkill -f "python.*api.py" && pkill -f "python.*http.server"`
 
 Access the services:
 - **Flatnotes**: http://localhost:8080
