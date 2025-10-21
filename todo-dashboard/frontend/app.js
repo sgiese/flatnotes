@@ -275,32 +275,103 @@ function renderListView(todos) {
         return;
     }
 
-    container.innerHTML = todos.map(todo => `
-        <div class="todo-item">
-            <input type="checkbox" 
-                   class="todo-checkbox" 
-                   ${todo.completed ? 'checked' : ''}
-                   data-file="${todo.file_path}"
-                   data-line="${todo.line_number}"
-                   onchange="toggleTodo('${todo.file_path}', ${todo.line_number})">
-            <div class="todo-content">
-                <div class="todo-text ${todo.completed ? 'completed' : ''}">
-                    ${renderPriority(todo.priority)}
-                    ${escapeHtml(todo.text)}
+    // Group todos by their group_id
+    const groups = {};
+    todos.forEach(todo => {
+        const groupKey = todo.group_id || `single_${todo.id}`;
+        if (!groups[groupKey]) {
+            groups[groupKey] = {
+                todos: [],
+                heading: todo.heading,
+                heading_level: todo.heading_level,
+                file: todo.file,
+                start_line: todo.group_start_line
+            };
+        }
+        groups[groupKey].todos.push(todo);
+    });
+
+    // Render grouped todos
+    const groupedHtml = Object.values(groups).map(group => {
+        const isGroup = group.todos.length > 1;
+        
+        if (isGroup) {
+            // Render as a grouped list with heading
+            return `
+                <div class="todo-group">
+                    ${group.heading ? `
+                        <div class="todo-group-header">
+                            <h${Math.min(group.heading_level + 2, 6)} class="todo-group-title">
+                                ${escapeHtml(group.heading)}
+                            </h${Math.min(group.heading_level + 2, 6)}>
+                            <a href="${FLATNOTES_URL}/note/${encodeURIComponent(group.file.replace('.md', ''))}#L${group.start_line}" 
+                               target="_blank" 
+                               class="todo-group-link">
+                               📄 ${group.file}:${group.start_line}
+                            </a>
+                        </div>
+                    ` : `
+                        <div class="todo-group-header">
+                            <a href="${FLATNOTES_URL}/note/${encodeURIComponent(group.file.replace('.md', ''))}#L${group.start_line}" 
+                               target="_blank" 
+                               class="todo-group-link">
+                               📄 ${group.file}:${group.start_line}
+                            </a>
+                        </div>
+                    `}
+                    <div class="todo-group-items">
+                        ${group.todos.map(todo => `
+                            <div class="todo-item grouped">
+                                <input type="checkbox" 
+                                       class="todo-checkbox" 
+                                       ${todo.completed ? 'checked' : ''}
+                                       onchange="toggleTodo('${todo.file_path}', ${todo.line_number})">
+                                <div class="todo-content">
+                                    <div class="todo-text ${todo.completed ? 'completed' : ''}">
+                                        ${renderPriority(todo.priority)}
+                                        ${escapeHtml(todo.text)}
+                                    </div>
+                                    <div class="todo-meta compact">
+                                        ${todo.tags.map(tag => `<span class="todo-tag">#${tag}</span>`).join('')}
+                                        ${todo.due_date ? `<span class="todo-due ${isOverdue(todo.due_date) ? 'overdue' : ''}">📅 ${todo.due_date}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-                <div class="todo-meta">
-                    <a href="${FLATNOTES_URL}/note/${encodeURIComponent(todo.file.replace('.md', ''))}#L${todo.line_number}" 
-                       target="_blank" 
-                       class="todo-file">
-                       📄 ${todo.file}:${todo.line_number}
-                    </a>
-                    ${todo.tags.map(tag => `<span class="todo-tag">#${tag}</span>`).join('')}
-                    ${todo.due_date ? `<span class="todo-due ${isOverdue(todo.due_date) ? 'overdue' : ''}">📅 ${todo.due_date}</span>` : ''}
+            `;
+        } else {
+            // Render as a single todo item
+            const todo = group.todos[0];
+            return `
+                <div class="todo-item">
+                    <input type="checkbox" 
+                           class="todo-checkbox" 
+                           ${todo.completed ? 'checked' : ''}
+                           onchange="toggleTodo('${todo.file_path}', ${todo.line_number})">
+                    <div class="todo-content">
+                        <div class="todo-text ${todo.completed ? 'completed' : ''}">
+                            ${renderPriority(todo.priority)}
+                            ${escapeHtml(todo.text)}
+                        </div>
+                        <div class="todo-meta">
+                            <a href="${FLATNOTES_URL}/note/${encodeURIComponent(todo.file.replace('.md', ''))}#L${todo.line_number}" 
+                               target="_blank" 
+                               class="todo-file">
+                               📄 ${todo.file}:${todo.line_number}
+                            </a>
+                            ${todo.tags.map(tag => `<span class="todo-tag">#${tag}</span>`).join('')}
+                            ${todo.due_date ? `<span class="todo-due ${isOverdue(todo.due_date) ? 'overdue' : ''}">📅 ${todo.due_date}</span>` : ''}
+                        </div>
+                        ${todo.context ? `<div class="todo-context">${escapeHtml(todo.context)}</div>` : ''}
+                    </div>
                 </div>
-                ${todo.context ? `<div class="todo-context">${escapeHtml(todo.context)}</div>` : ''}
-            </div>
-        </div>
-    `).join('');
+            `;
+        }
+    }).join('');
+
+    container.innerHTML = groupedHtml;
 }
 
 function renderKanbanView(todos) {

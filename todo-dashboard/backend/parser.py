@@ -17,6 +17,7 @@ class TodoParser:
     def __init__(self, data_dir: str = "/home/sgiese/coding/flatnotes/data"):
         self.data_dir = Path(data_dir)
         self.todo_pattern = re.compile(r'^(\s*)-\s+\[([ xX])\]\s+(.+)$', re.MULTILINE)
+        self.heading_pattern = re.compile(r'^(#{1,6})\s+(.+)$', re.MULTILINE)
         self.tag_pattern = re.compile(r'#(\w+(?:-\w+)*)')
         self.date_pattern = re.compile(r'\b(\d{4}-\d{2}-\d{2})\b')
         self.priority_pattern = re.compile(r'(?:^|\s)(!{1,3})(?:\s|$)')
@@ -70,16 +71,42 @@ class TodoParser:
         }
     
     def parse_todos(self, content: str, file_path: Path) -> List[Dict]:
-        """Extract todos from markdown content"""
+        """Extract todos from markdown content with heading information"""
         todos = []
         lines = content.split('\n')
         
+        # Track current heading
+        current_heading = None
+        heading_level = 0
+        
+        # Track groups of contiguous todos
+        last_todo_line = -999
+        group_id = None
+        group_start_line = None
+        
         for i, line in enumerate(lines):
+            # Check for headings
+            heading_match = self.heading_pattern.match(line)
+            if heading_match:
+                heading_level = len(heading_match.group(1))
+                current_heading = heading_match.group(2).strip()
+                continue
+            
+            # Check for todos
             match = self.todo_pattern.match(line)
             if match:
                 indent = len(match.group(1))
                 completed = match.group(2).lower() == 'x'
                 text = match.group(3)
+                
+                # Check if this is part of a contiguous group
+                is_contiguous = (i == last_todo_line + 1)
+                if not is_contiguous:
+                    # Start a new group
+                    group_id = f"{file_path.stem}_{i}"
+                    group_start_line = i + 1
+                
+                last_todo_line = i
                 
                 # Extract context
                 context = self.extract_context(lines, i)
@@ -101,7 +128,12 @@ class TodoParser:
                     "due_date": metadata["due_date"],
                     "priority": metadata["priority"],
                     "context": context,
-                    "created_date": datetime.fromtimestamp(file_path.stat().st_mtime).isoformat()
+                    "created_date": datetime.fromtimestamp(file_path.stat().st_mtime).isoformat(),
+                    "heading": current_heading,
+                    "heading_level": heading_level if current_heading else 0,
+                    "group_id": group_id,
+                    "group_start_line": group_start_line,
+                    "is_contiguous": is_contiguous
                 }
                 
                 todos.append(todo)
