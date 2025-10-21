@@ -164,15 +164,17 @@ h1 {
 
 /* List View */
 .todo-list {
-    background: var(--surface);
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .todo-item {
     padding: 12px;
-    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-color);
     display: flex;
     align-items: start;
     gap: 12px;
@@ -183,17 +185,13 @@ h1 {
     background: var(--background);
 }
 
-.todo-item:last-child {
-    border-bottom: none;
-}
-
 /* Grouped Todos */
 .todo-group {
-    margin-bottom: 20px;
     background: var(--surface);
     border-radius: 8px;
-    padding: 15px;
+    padding: 12px 15px;
     border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow);
 }
 
 .todo-group-header {
@@ -227,13 +225,16 @@ h1 {
 }
 
 .todo-item.grouped {
-    padding: 8px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    margin: 4px 0;
+    padding: 6px 8px;
+    border-bottom: none;
+    border-left: none;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
-.todo-item.grouped:last-child {
-    border-bottom: none;
+.todo-item.grouped:hover {
+    background: rgba(0,0,0,0.02);
 }
 
 .todo-meta.compact {
