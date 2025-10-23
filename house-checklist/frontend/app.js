@@ -5,6 +5,7 @@ const WS_URL = 'ws://localhost:8003/ws';
 let checklistData = null;
 let currentSection = 'interior';
 let socket = null;
+let accordionState = {}; // Store which accordions are open
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +26,9 @@ function setupWebSocket() {
         const message = JSON.parse(event.data);
         if (message.type === 'update' || message.type === 'initial') {
             checklistData = message.data;
+            saveAccordionState();
             renderChecklist();
+            restoreAccordionState();
             updateStatistics();
             document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
         }
@@ -72,15 +75,21 @@ function switchSection(section) {
 async function loadChecklistData() {
     try {
         const response = await fetch(`${API_URL}/house-checklist`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         checklistData = await response.json();
         
+        console.log('Loaded checklist data from API:', checklistData);
         renderChecklist();
         updateStatistics();
         document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
     } catch (error) {
-        console.error('Failed to load checklist:', error);
-        // For now, use sample data
-        loadSampleData();
+        console.error('Failed to load checklist from API:', error);
+        console.log('API may not be running or data format has changed');
+        // Don't fall back to sample data - show error instead
+        document.getElementById('interior-accordion').innerHTML = '<p>Error loading checklist data. Please check if the API is running.</p>';
+        document.getElementById('exterior-accordion').innerHTML = '<p>Error loading checklist data. Please check if the API is running.</p>';
     }
 }
 
@@ -311,6 +320,31 @@ function loadSampleData() {
     document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
 }
 
+// Save the current accordion state
+function saveAccordionState() {
+    accordionState = {};
+    document.querySelectorAll('.accordion-header.active, .sub-accordion-header.active, .room-accordion-header.active').forEach(header => {
+        const id = header.getAttribute('data-accordion-id');
+        if (id) {
+            accordionState[id] = true;
+        }
+    });
+}
+
+// Restore accordion state after render
+function restoreAccordionState() {
+    Object.keys(accordionState).forEach(id => {
+        const header = document.querySelector(`[data-accordion-id="${id}"]`);
+        if (header) {
+            const content = header.nextElementSibling;
+            if (content && accordionState[id]) {
+                header.classList.add('active');
+                content.classList.add('active');
+            }
+        }
+    });
+}
+
 // Render the checklist accordion
 function renderChecklist() {
     renderSection('interior');
@@ -333,6 +367,7 @@ function renderSection(section) {
         // Create phase header
         const phaseHeader = document.createElement('div');
         phaseHeader.className = 'accordion-header';
+        phaseHeader.setAttribute('data-accordion-id', phaseId);
         phaseHeader.innerHTML = `
             <div class="accordion-title">
                 <span class="accordion-icon">▶</span>
@@ -362,6 +397,7 @@ function renderSection(section) {
                 
                 const subHeader = document.createElement('div');
                 subHeader.className = 'sub-accordion-header';
+                subHeader.setAttribute('data-accordion-id', subId);
                 subHeader.innerHTML = `
                     <div class="accordion-title">
                         <span class="accordion-icon">▶</span>
@@ -386,6 +422,7 @@ function renderSection(section) {
                         
                         const roomHeader = document.createElement('div');
                         roomHeader.className = 'room-accordion-header';
+                        roomHeader.setAttribute('data-accordion-id', roomId);
                         const roomProgress = calculateRoomProgress(room);
                         roomHeader.innerHTML = `
                             <div class="accordion-title">
@@ -649,14 +686,28 @@ function updateStatistics() {
     checklistData.interior.phases.forEach(phase => {
         if (phase.subPhases) {
             phase.subPhases.forEach(subPhase => {
-                subPhase.tasks.forEach(task => {
-                    totalTasks++;
-                    interiorTotal++;
-                    if (task.completed) {
-                        completedTasks++;
-                        interiorCompleted++;
-                    }
-                });
+                // Check if subPhase has rooms (for painting phase)
+                if (subPhase.rooms) {
+                    subPhase.rooms.forEach(room => {
+                        room.tasks.forEach(task => {
+                            totalTasks++;
+                            interiorTotal++;
+                            if (task.completed) {
+                                completedTasks++;
+                                interiorCompleted++;
+                            }
+                        });
+                    });
+                } else if (subPhase.tasks) {
+                    subPhase.tasks.forEach(task => {
+                        totalTasks++;
+                        interiorTotal++;
+                        if (task.completed) {
+                            completedTasks++;
+                            interiorCompleted++;
+                        }
+                    });
+                }
             });
         } else if (phase.tasks) {
             phase.tasks.forEach(task => {

@@ -102,6 +102,14 @@ class ToggleRequest(BaseModel):
     taskIndex: int
     completed: bool
 
+class ToggleRoomRequest(BaseModel):
+    section: str
+    phaseIndex: int
+    subPhaseIndex: int
+    roomIndex: int
+    taskIndex: int
+    completed: bool
+
 @app.get("/")
 def read_root():
     return {"message": "House Checklist API", "endpoints": ["/house-checklist", "/statistics", "/house-checklist/toggle"]}
@@ -167,6 +175,79 @@ def toggle_task(request: ToggleRequest):
             return {"success": True, "message": "Task updated", "completed": request.completed}
         else:
             return {"success": False, "message": "Task not found"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/house-checklist/toggle-room")
+def toggle_room_task(request: ToggleRoomRequest):
+    """Toggle a room task's completion status (for painting phase)"""
+    try:
+        # Parse current data to find line number
+        with open(parser.file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        # Parse to get structured data
+        data = parser.parse_checklist()
+        section_data = data[request.section]
+        phase = section_data['phases'][request.phaseIndex]
+        
+        # Get the room task text to find in file
+        if 'subPhases' in phase:
+            subPhase = phase['subPhases'][request.subPhaseIndex]
+            if 'rooms' in subPhase:
+                room = subPhase['rooms'][request.roomIndex]
+                task = room['tasks'][request.taskIndex]
+                task_text = task['text']
+                
+                # Find and update the line in the file
+                # Need to be more specific since there are multiple tasks with same name
+                # Build a context string to find the exact task
+                room_title = room['title']
+                subphase_title = subPhase['title']
+                
+                updated = False
+                in_correct_room = False
+                in_correct_subphase = False
+                
+                for i, line in enumerate(lines):
+                    # Check if we're in the correct subphase
+                    if f"**{subphase_title}**" in line:
+                        in_correct_subphase = True
+                        in_correct_room = False
+                        continue
+                    # Check if we're in the correct room
+                    if in_correct_subphase and f"**{room_title}**" in line:
+                        in_correct_room = True
+                        continue
+                    # Check if we've moved to a different room or phase
+                    if in_correct_room and '**' in line and room_title not in line:
+                        in_correct_room = False
+                        continue
+                    # Update the task if we're in the correct room
+                    if in_correct_room and task_text in line and '- [' in line:
+                        if request.completed:
+                            lines[i] = line.replace('- [ ]', '- [x]')
+                        else:
+                            lines[i] = line.replace('- [x]', '- [ ]').replace('- [X]', '- [ ]')
+                        updated = True
+                        break
+                
+                if updated:
+                    # Write back to file
+                    with open(parser.file_path, 'w', encoding='utf-8') as f:
+                        f.writelines(lines)
+                    
+                    # Trigger file watcher notification
+                    file_changed()
+                    
+                    return {"success": True, "message": "Room task updated", "completed": request.completed}
+                else:
+                    return {"success": False, "message": "Task not found"}
+            else:
+                return {"success": False, "message": "No rooms found in subphase"}
+        else:
+            return {"success": False, "message": "No subphases found in phase"}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
