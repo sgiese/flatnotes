@@ -85,6 +85,18 @@ run = """
   python parser.py
 """
 
+[tasks.house-start]
+description = "Start House Checklist server"
+run = "cd house-checklist && ./start.sh"
+
+[tasks.house-stop]
+description = "Stop House Checklist server"
+run = "cd house-checklist && ./stop.sh"
+
+[tasks.house-restart]
+description = "Restart House Checklist server"
+run = "cd house-checklist && ./restart.sh"
+
 [tasks.stop]
 description = "Stop all services"
 run = """

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Completion Checklist</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>House Completion Checklist</h1>
+            <div class="last-updated">Last updated: <span id="last-updated">-</span></div>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left side: Checklist with accordion -->
+            <div class="checklist-panel">
+                <div class="section-tabs">
+                    <button class="tab-btn active" data-section="interior">Interior Tasks</button>
+                    <button class="tab-btn" data-section="exterior">Exterior Tasks</button>
+                </div>
+                
+                <div id="interior-section" class="checklist-section active">
+                    <div id="interior-accordion" class="accordion">
+                        <!-- Interior accordion items will be populated here -->
+                    </div>
+                </div>
+                
+                <div id="exterior-section" class="checklist-section">
+                    <div id="exterior-accordion" class="accordion">
+                        <!-- Exterior accordion items will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side: Statistics and charts -->
+            <div class="stats-panel">
+                <div class="stat-card compact-progress">
+                    <h3>Overall Progress</h3>
+                    <div class="progress-row">
+                        <div class="progress-circle compact" id="overall-progress">
+                            <svg width="100" height="100">
+                                <circle cx="50" cy="50" r="45" class="progress-bg"/>
+                                <circle cx="50" cy="50" r="45" class="progress-fill" id="overall-circle"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="percentage" id="overall-percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-details compact">
+                            <div class="detail-row">
+                                <span>Total:</span>
+                                <span id="total-tasks">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Complete:</span>
+                                <span id="completed-tasks">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Remaining:</span>
+                                <span id="remaining-tasks">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card compact-progress">
+                    <h3>Interior Progress</h3>
+                    <div class="progress-row">
+                        <div class="progress-circle compact" id="interior-progress">
+                            <svg width="100" height="100">
+                                <circle cx="50" cy="50" r="45" class="progress-bg"/>
+                                <circle cx="50" cy="50" r="45" class="progress-fill interior" id="interior-circle"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="percentage" id="interior-percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-details compact">
+                            <div class="detail-row">
+                                <span>Total:</span>
+                                <span id="interior-total">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Complete:</span>
+                                <span id="interior-completed">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Remaining:</span>
+                                <span id="interior-remaining">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card compact-progress">
+                    <h3>Exterior Progress</h3>
+                    <div class="progress-row">
+                        <div class="progress-circle compact" id="exterior-progress">
+                            <svg width="100" height="100">
+                                <circle cx="50" cy="50" r="45" class="progress-bg"/>
+                                <circle cx="50" cy="50" r="45" class="progress-fill exterior" id="exterior-circle"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="percentage" id="exterior-percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-details compact">
+                            <div class="detail-row">
+                                <span>Total:</span>
+                                <span id="exterior-total">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Complete:</span>
+                                <span id="exterior-completed">0</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Remaining:</span>
+                                <span id="exterior-remaining">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card phase-breakdown">
+                    <h3>Phase Breakdown</h3>
+                    <div id="phase-chart">
+                        <!-- Phase breakdown will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
