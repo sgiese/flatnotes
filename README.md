@@ -53,29 +53,44 @@ mise run install
 
 #### Running the System
 
-Start everything:
+Start all services:
 ```bash
+# Start everything (Flatnotes + Todo Dashboard)
 mise run start
-```
 
-Or run services individually:
-
-```bash
-# Start Flatnotes
+# Or start Flatnotes only
 mise run flatnotes
 
-# Start Todo Dashboard
+# Or start Todo Dashboard (backend + frontend)
 mise run todo
+
+# Or start Todo Dashboard components separately
+mise run todo-backend   # API on port 8001
+mise run todo-frontend  # Web UI on port 8002
 ```
 
-Stop Todo Dashboard:
-- Press `Ctrl+C` in the terminal where it's running, or
-- From another terminal: `pkill -f "python.*api.py" && pkill -f "python.*http.server"`
+House Checklist service:
+```bash
+# Start House Checklist
+mise run house-start
+
+# Stop House Checklist
+mise run house-stop
+
+# Restart House Checklist
+mise run house-restart
+```
+
+Stop all services:
+```bash
+mise run stop
+```
 
 Access the services:
 - **Flatnotes**: http://localhost:8080
 - **Todo Dashboard**: http://localhost:8002
-- **API Documentation**: http://localhost:8001/docs
+- **Todo Dashboard API**: http://localhost:8001/docs
+- **House Checklist**: Check house-checklist/start.sh for configured port
 
 ### 📁 Project Structure
 
