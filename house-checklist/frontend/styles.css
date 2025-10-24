@@ -311,6 +311,42 @@ body[data-theme="dark"] .theme-icon.moon-icon,
     color: var(--primary-color);
 }
 
+/* Dark mode overrides for accordions */
+[data-theme="dark"] .accordion-header {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .accordion-header:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .accordion-content {
+    background: var(--background);
+}
+
+[data-theme="dark"] .accordion-body {
+    background: var(--background);
+}
+
+/* Dark mode overrides for sub-accordions */
+[data-theme="dark"] .sub-accordion-item {
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .sub-accordion-header {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .sub-accordion-header:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .sub-accordion-header.active {
+    background: rgba(59, 130, 246, 0.3);
+}
+
 /* Checklist Items */
 .checklist-items {
     padding: 10px 15px;
