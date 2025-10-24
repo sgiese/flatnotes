@@ -14,6 +14,21 @@
     --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
 }
 
+[data-theme="dark"],
+body[data-theme="dark"] {
+    --primary-color: #3b82f6;
+    --success-color: #34d399;
+    --warning-color: #fbbf24;
+    --danger-color: #f87171;
+    --background: #111827;
+    --surface: #1f2937;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --border: #374151;
+    --shadow: 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.3);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -25,6 +40,7 @@ body {
     background: var(--background);
     color: var(--text-primary);
     line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -50,9 +66,67 @@ h1 {
     color: var(--text-primary);
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 .last-updated {
     color: var(--text-secondary);
     font-size: 14px;
+}
+
+.theme-toggle {
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.theme-toggle:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.theme-toggle:hover .theme-icon {
+    color: white;
+}
+
+.theme-icon {
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    position: absolute;
+}
+
+.theme-icon.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.theme-icon.moon-icon {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+body[data-theme="dark"] .theme-icon.sun-icon,
+[data-theme="dark"] .theme-icon.sun-icon {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+body[data-theme="dark"] .theme-icon.moon-icon,
+[data-theme="dark"] .theme-icon.moon-icon {
+    opacity: 1;
+    transform: rotate(0deg);
 }
 
 .main-content {

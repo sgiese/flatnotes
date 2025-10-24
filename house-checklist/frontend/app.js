@@ -9,6 +9,7 @@ let accordionState = {}; // Store which accordions are open
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
     loadChecklistData();
     setupEventListeners();
     setupWebSocket();
@@ -53,6 +54,39 @@ function setupEventListeners() {
             switchSection(e.target.dataset.section);
         });
     });
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+// Initialize theme from localStorage or system preference
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('house-checklist-theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    setTheme(theme);
+}
+
+// Set the theme
+function setTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    // Also set on documentElement for broader compatibility
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+// Toggle between light and dark themes
+function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    console.log('Toggling theme from', currentTheme, 'to', newTheme);
+    
+    setTheme(newTheme);
+    localStorage.setItem('house-checklist-theme', newTheme);
 }
 
 // Switch between Interior and Exterior sections
